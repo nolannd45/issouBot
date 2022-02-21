@@ -106,6 +106,42 @@ async def kick(ctx, user : discord.User):
   await ctx.guild.kick(user)
   await ctx.send(f"DEHOOOOORS")
 
+
+import connexion
+from datetime import datetime
+
+@bot.command()
+async def devoir(ctx, *classe):
+  connection = connexion.getConnection()
+  cursor=connection.cursor()
+  sql = 'select * from DEVOIR where t_classe = %s order by t_date;'
+  cursor.execute(sql,classe)
+  result = cursor.fetchall()
+  dev = []
+  for x in result:
+      dev.append("le devoir "+x["nom"]+" est a faire pour le "+x["t_date"]+" publié par "+ x["t_user"])
+  var = "\n".join(dev)
+  embed = discord.Embed(title="Devoir", description=f"{var}", colour=discord.Colour.light_gray())
+  await ctx.send(embed=embed)
+
+
+
+@bot.command()
+async def addDevoir(ctx, nom, date, classe):
+  connection = connexion.getConnection()
+  cursor=connection.cursor()
+  sql = 'insert into DEVOIR(nom,t_date,t_user,t_channel,t_classe) values (%s,%s,%s,%s,%s)'
+  all = (nom,date,ctx.author,ctx.channel.name,classe)
+  cursor.execute(sql,all)
+  connection.commit()
+  connection.close()
+  embed = discord.Embed(title="Devoir", description=f"le devoir à été ajouté", colour=discord.Colour.light_gray())
+  await ctx.send(embed=embed)
+
+
+
+
+
 youtube_dl.utils.bug_reports_message = lambda: ''
 
 
