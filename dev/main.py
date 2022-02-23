@@ -1,11 +1,12 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import random
 import sys
 from discord.utils import get
 from discord import FFmpegPCMAudio
 import asyncio
-from datetime import date
+import datetime
+from datetime import date,timedelta
 import youtube_dl
 from discord import Spotify
 import functools
@@ -29,6 +30,11 @@ async def on_message(message):
     embed = discord.Embed(title="Kick", description=f"{message.author} a bien été Kick", colour=discord.Colour.light_gray())
     await message.reply(embed=embed)
   await bot.process_commands(message)
+
+@bot.command()
+async def yes(ctx):
+  general_channel = bot.get_channel(855446916291493939)
+  await general_channel.send("ecoute moi bien sac a merde, insulte moi encore une fois je mets en vente ta mere et hamsterdame sur le darknet petit fdp tu as compris ?")
 
 
 @bot.command()
@@ -111,7 +117,7 @@ import connexion
 from datetime import datetime
 
 @bot.command()
-async def devoir(ctx, *classe):
+async def devoir(ctx, *classe):   
   connection = connexion.getConnection()
   cursor=connection.cursor()
   sql = 'select * from DEVOIR where t_classe = %s order by t_date;'
@@ -123,21 +129,62 @@ async def devoir(ctx, *classe):
   var = "\n".join(dev)
   embed = discord.Embed(title="Devoir", description=f"{var}", colour=discord.Colour.light_gray())
   await ctx.send(embed=embed)
+  print(ctx)
 
 
 
 @bot.command()
 async def addDevoir(ctx, nom, date, classe):
-  connection = connexion.getConnection()
-  cursor=connection.cursor()
-  sql = 'insert into DEVOIR(nom,t_date,t_user,t_channel,t_classe) values (%s,%s,%s,%s,%s)'
-  all = (nom,date,ctx.author,ctx.channel.name,classe)
-  cursor.execute(sql,all)
-  connection.commit()
-  connection.close()
-  embed = discord.Embed(title="Devoir", description=f"le devoir à été ajouté", colour=discord.Colour.light_gray())
-  await ctx.send(embed=embed)
+    connection = connexion.getConnection()
+    cursor=connection.cursor()
+    sql = 'insert into DEVOIR(nom,t_date,t_user,t_channel,t_classe) values (%s,%s,%s,%s,%s)'
+    all = (nom,date,ctx.author,ctx.channel.name,classe)
+    cursor.execute(sql,all)
+    connection.commit()
+    connection.close()
+    embed = discord.Embed(title="Devoir", description=f"le devoir à été ajouté", colour=discord.Colour.light_gray())
+    await ctx.send(embed=embed)
 
+@bot.command()
+async def suppDevoir(ctx, *all):
+    connection = connexion.getConnection()
+    cursor=connection.cursor()
+    sql = 'delete from DEVOIR where nom=%s'
+    cursor.execute(sql,all)
+    connection.commit()
+    connection.close()
+    embed = discord.Embed(title="Devoir", description=f"le devoir à été supprimé", colour=discord.Colour.light_gray())
+    await ctx.send(embed=embed)
+
+@tasks.loop(hours=24)
+async def task():
+    print(verif())
+
+       
+def verif():
+    connection = connexion.getConnection()
+    cursor=connection.cursor()
+    sql = 'delete from DEVOIR where t_date<=%s'
+    today = date.today()
+    yes = today + timedelta(days=1)
+    cursor.execute(sql,yes)
+    connection.commit()
+    connection.close()
+
+        
+    return str(yes)
+
+     
+def rappel():
+    general_channel = bot.get_channel(855446916291493939)
+    general_channel.send("yes")
+
+        
+
+
+task.start()
+
+    
 
 
 
