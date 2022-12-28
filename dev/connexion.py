@@ -1,9 +1,10 @@
+
 import pymysql.cursors   
 # Connectez- vous à la base de données.
 def getConnection():
 	connection = pymysql.connect(host='localhost',
-								 user='root',
-								 password='root',                             
+								 user='nono',
+								 password='nono',                             
 								 db='DBagenda',
 								 charset='utf8mb4',
 								 cursorclass=pymysql.cursors.DictCursor) 

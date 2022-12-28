@@ -15,13 +15,14 @@ import math
 from async_timeout import timeout
 import key
 
-
 musics = {}
 ytdl = youtube_dl.YoutubeDL()
 
 
 bot = commands.Bot(command_prefix = "-", description = "IssouBotCorporation")
-
+@bot.listen()
+async def on_ready():
+    numOfDays.start()
 
 @bot.event
 async def on_message(message):
@@ -45,7 +46,13 @@ async def heydar(ctx):
     if not voice_client.is_playing():
         voice_client.play(audio_source, after=None)
 
-
+@tasks.loop(hours=24.0)
+async def numOfDays():
+    general_channel = bot.get_channel(830799450938146868)
+    date1 = date.today()
+    date2 = date(2023, 3, 21)
+    embed = discord.Embed(title="COMPTE A REBOURS", description=f"<@" + str(326806194792562691) + ">" + " il te reste plus que " +str((date2-date1).days) +" jours avant la majorité de sarah..", colour=discord.Colour.light_gray())
+    await general_channel.send(embed=embed)
 @bot.command()
 async def badissou(ctx):
     guild = ctx.guild
@@ -72,6 +79,10 @@ async def pf(ctx):
         """)
 
 
+@commands.has_role("admin") 
+async def kick(ctx, user : discord.User):
+  await ctx.guild.kick(user)
+  await ctx.send(f"DEHOOOOORS")
 
 
 @bot.command()
@@ -107,7 +118,7 @@ async def on_member_join(member):
     await member.send('Private message')
 
 @bot.command()
-@commands.has_role("OVH") 
+@commands.has_role("admin") 
 async def kick(ctx, user : discord.User):
   await ctx.guild.kick(user)
   await ctx.send(f"DEHOOOOORS")
@@ -672,5 +683,6 @@ bot.add_cog(Music(bot))
 @bot.event
 async def on_ready():
     print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
+
 
 bot.run(key.key)
